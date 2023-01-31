@@ -18,14 +18,19 @@ dependencies = [
   "pytest",
   # Linting
   "ruff",
-  "phidata==1.1.2",
-  # Api framework
+  "phidata==1.1.4",
+  # Api libraries
+  "alembic",
+  "celery[redis]",
   "fastapi",
-  # Api CLI
+  "psycopg2-binary",
+  "sqlalchemy",
   "typer",
-  # Api server
   "uvicorn[standard]",
 ]
+
+[project.scripts]
+api = "app.cli.api:api"
 
 [build-system]
 requires = ["setuptools"]
@@ -33,9 +38,6 @@ build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
 packages = ["app", "workspace"]
-
-[project.scripts]
-api = "app.cli.api:api"
 
 # Update this value if the workspace directory is renamed.
 # [tool.phidata]

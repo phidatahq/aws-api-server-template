@@ -31,20 +31,20 @@ dev_redis = Redis(
 
 # -*- Api Image
 dev_api_image = DockerImage(
-    name=f"{ws_settings.image_repo}/{ws_settings.ws_name}-{ws_settings.image_suffix}",
+    name=f"{ws_settings.image_repo}/{ws_settings.ws_name}",
     tag=ws_settings.dev_env,
     enabled=ws_settings.dev_api_enabled,
     path=str(ws_settings.ws_dir.parent),
     platform="linux/amd64",
     pull=ws_settings.force_pull_images,
-    # push_image=ws_settings.push_images,
+    push_image=ws_settings.push_images,
     skip_docker_cache=ws_settings.skip_image_cache,
     use_cache=ws_settings.use_cache,
 )
 
 # -*- Api Container
 dev_api_container = DockerContainer(
-    name=f"{ws_settings.ws_name}-{ws_settings.image_suffix}",
+    name=f"{ws_settings.ws_name}",
     enabled=ws_settings.dev_api_enabled,
     image=dev_api_image.get_image_str(),
     command=["api-dev"],
@@ -65,22 +65,17 @@ dev_api_container = DockerContainer(
         # Celery configuration
         "CELERY_REDIS_DB": "2",
         # Upgrade database on startup
-        "UPGRADE_DB": True,
+        # "UPGRADE_DB": True,
         # Wait for database and redis to be ready
         "WAIT_FOR_DB": True,
         "WAIT_FOR_REDIS": True,
-        "OPENAI_API_KEY": getenv("OPENAI_API_KEY"),
-        "GOOGLE_CLIENT_ID": getenv("GOOGLE_CLIENT_ID"),
-        "GITHUB_CLIENT_ID": getenv("GITHUB_CLIENT_ID_DEV"),
-        "GITHUB_CLIENT_SECRET": getenv("GITHUB_CLIENT_SECRET_DEV"),
-        "SENTRY_DSN": getenv("SENTRY_DSN"),
     },
     ports={
         "8000": "8000",
     },
     volumes={
         str(ws_settings.ws_dir.parent): {
-            "bind": "/usr/local/backend",
+            "bind": "/usr/local/app",
             "mode": "rw",
         },
     },

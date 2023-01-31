@@ -162,12 +162,6 @@ prd_api_container = EcsContainer(
         # {"name": "REDIS_DRIVER", "value": "rediss"},
         # Celery configuration
         {"name": "CELERY_REDIS_DB", "value": "2"},
-        # Credentials from .env
-        {"name": "OPENAI_API_KEY", "value": getenv("OPENAI_API_KEY")},
-        {"name": "GOOGLE_CLIENT_ID", "value": getenv("GOOGLE_CLIENT_ID")},
-        {"name": "GITHUB_CLIENT_ID", "value": getenv("GITHUB_CLIENT_ID_PRD")},
-        {"name": "GITHUB_CLIENT_SECRET", "value": getenv("GITHUB_CLIENT_SECRET_PRD")},
-        {"name": "SENTRY_DSN", "value": getenv("SENTRY_DSN")},
     ],
     log_configuration={
         "logDriver": "awslogs",
@@ -205,7 +199,7 @@ prd_api_service = EcsService(
     task_definition=prd_api_task,
     load_balancers=[
         {
-            "targetGroupArn": "arn:aws:elasticloadbalancing:us-east-1:386435111151:targetgroup/backend-prd-api-tg/f43488b11bcb886f",  # noqa: E501
+            "targetGroupArn": "arn:aws:elasticloadbalancing:us-east-1:@@@:targetgroup/@@@-tg/@@@",  # noqa: E501
             "containerName": prd_api_container.name,
             "containerPort": api_container_port,
         }
