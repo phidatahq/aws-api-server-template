@@ -117,19 +117,13 @@ prd_api_container = EcsContainer(
         {"name": "WAIT_FOR_REDIS", "value": "True"},
         # {"name": "UPGRADE_DB", "value": "True"},
         # Database configuration
-        {
-            "name": "DB_HOST",
-            "value": "backend-prd-db-a.cuqtj11ky8hc.us-east-1.rds.amazonaws.com",
-        },
+        {"name": "DB_HOST", "value": ""},
         {"name": "DB_PORT", "value": "5432"},
         {"name": "DB_USER", "value": prd_db_instance.get_master_username()},
         {"name": "DB_PASS", "value": prd_db_instance.get_master_user_password()},
         {"name": "DB_SCHEMA", "value": prd_db_instance.get_db_name()},
         # Redis configuration
-        {
-            "name": "REDIS_HOST",
-            "value": "backend-prd-cache.kymr3h.0001.use1.cache.amazonaws.com",
-        },
+        {"name": "REDIS_HOST", "value": ""},
         {"name": "REDIS_PORT", "value": "6379"},
         # {"name": "REDIS_PASS", "value": ""},
         {"name": "REDIS_SCHEMA", "value": "1"},
@@ -171,13 +165,6 @@ prd_api_service = EcsService(
     launch_type=launch_type,
     cluster=prd_ecs_cluster,
     task_definition=prd_api_task,
-    load_balancers=[
-        {
-            "targetGroupArn": "arn:aws:elasticloadbalancing:us-east-1:@@@:targetgroup/@@@-tg/@@@",  # noqa: E501
-            "containerName": prd_api_container.name,
-            "containerPort": api_container_port,
-        }
-    ],
     network_configuration={
         "awsvpcConfiguration": {
             "subnets": ws_settings.public_subnets,
