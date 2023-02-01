@@ -43,7 +43,7 @@ dev_api_image = DockerImage(
 
 # -*- Api Container
 dev_api_container = DockerContainer(
-    name=f"{ws_settings.ws_name}",
+    name=f"{ws_settings.ws_name}-server",
     enabled=ws_settings.dev_api_enabled,
     image=dev_api_image.get_image_str(),
     command=["api-dev"],

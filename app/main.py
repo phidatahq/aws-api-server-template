@@ -40,7 +40,7 @@ def create_app() -> Tuple[FastAPI, AppSettings]:
     )
 
     if app_settings.runtime == "dev":
-        logger.debug(f"Settings: {app_settings.json(indent=2)}")
+        logger.info(f"Settings: {app_settings.json(indent=2)}")
 
     return app, app_settings
 

@@ -7,7 +7,7 @@ from phidata.workspace.settings import WorkspaceSettings
 #
 ws_settings = WorkspaceSettings(
     # Workspace name: used for naming cloud resources
-    ws_name="api-server",
+    ws_name="api001",
     # Path to the workspace directory
     ws_dir=Path(__file__).parent.resolve(),
     # -*- Dev settings
