@@ -21,12 +21,14 @@ dependencies = [
   "phidata==1.2.0",
   # Api libraries
   "alembic",
-  "celery[redis]",
   "fastapi",
+  "typer",
+  "uvicorn",
+  # For postgres
   "psycopg2-binary",
   "sqlalchemy",
-  "typer",
-  "uvicorn[standard]",
+  # For celery + redis
+  "celery[redis]",
 ]
 
 [project.scripts]
