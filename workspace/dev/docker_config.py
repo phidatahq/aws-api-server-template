@@ -46,8 +46,11 @@ dev_api_container = DockerContainer(
     name=f"{ws_settings.ws_name}",
     enabled=ws_settings.dev_api_enabled,
     image=dev_api_image.get_image_str(),
-    command=["api-dev"],
+    # command=["api-dev"],
     platform="linux/amd64",
+    detach=False,
+    stdout=True,
+    stderr=True,
     environment={
         "RUNTIME": "dev",
         # Database configuration

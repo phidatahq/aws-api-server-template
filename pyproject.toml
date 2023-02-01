@@ -30,7 +30,7 @@ dependencies = [
 ]
 
 [project.scripts]
-api = "app.cli.api:api"
+api = "app.cli.api:app"
 
 [build-system]
 requires = ["setuptools"]
