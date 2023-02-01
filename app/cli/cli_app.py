@@ -1,6 +1,6 @@
-"""The `app` cli
+"""The `api` cli
 Usage:
-    $ app --help
+    $ api --help
 """
 
 import typer
@@ -9,7 +9,7 @@ from app.utils.log import logger, set_log_level_to_debug
 
 
 app = typer.Typer(
-    help="App CLI",
+    help="Api CLI",
     no_args_is_help=True,
     invoke_without_command=True,
     # https://typer.tiangolo.com/tutorial/exceptions/#disable-local-variables-for-security
@@ -28,12 +28,12 @@ def start(
 ):
     """
     \b
-    Start app
+    Start api
 
     \b
     Examples:
-    * `app start`    -> Start App
-    * `app start -r` -> Start App with reload
+    * `api start`    -> Start App
+    * `api start -r` -> Start App with reload
     """
     import uvicorn
     from app.main import app_settings

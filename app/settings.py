@@ -27,6 +27,7 @@ class AppSettings(BaseSettings):
 
         runtime = values.get("runtime")
         if runtime == "dev":
+            # 3000 is the default port for create-react-app
             valid_cors.extend(["http://localhost:3000"])
 
         return valid_cors

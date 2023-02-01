@@ -1,4 +1,3 @@
-from os import getenv
 from phidata.app.postgres import PostgresDb
 from phidata.app.redis import Redis
 from phidata.docker.config import DockerConfig, DockerContainer, DockerImage
@@ -33,7 +32,7 @@ dev_redis = Redis(
 dev_api_image = DockerImage(
     name=f"{ws_settings.image_repo}/{ws_settings.ws_name}",
     tag=ws_settings.dev_env,
-    enabled=ws_settings.dev_api_enabled,
+    enabled=ws_settings.build_images,
     path=str(ws_settings.ws_dir.parent),
     platform="linux/amd64",
     pull=ws_settings.force_pull_images,
@@ -50,7 +49,7 @@ dev_api_container = DockerContainer(
     command=["api-dev"],
     platform="linux/amd64",
     environment={
-        "BUILD_ENV": "dev",
+        "RUNTIME": "dev",
         # Database configuration
         "DB_HOST": dev_db.get_db_host_docker(),
         "DB_PORT": dev_db.get_db_port_docker(),
@@ -71,7 +70,7 @@ dev_api_container = DockerContainer(
         "WAIT_FOR_REDIS": True,
     },
     ports={
-        "8000": "8000",
+        "9090": "9090",
     },
     volumes={
         str(ws_settings.ws_dir.parent): {

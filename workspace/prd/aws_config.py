@@ -1,5 +1,3 @@
-from os import getenv
-
 from phidata.aws.config import AwsConfig
 from phidata.aws.resource.group import (
     AwsResourceGroup,
@@ -34,7 +32,7 @@ wait_for_delete: bool = True
 prd_db_subnet_group = DbSubnetGroup(
     name=f"{ws_settings.prd_key}-db-sg",
     enabled=ws_settings.prd_postgres_enabled,
-    subnet_ids=ws_settings.private_subnets,
+    subnet_ids=ws_settings.subnet_ids,
     skip_create=skip_create,
     skip_delete=skip_delete,
     wait_for_creation=wait_for_create,
@@ -45,17 +43,17 @@ prd_db_subnet_group = DbSubnetGroup(
 prd_redis_subnet_group = CacheSubnetGroup(
     name=f"{ws_settings.prd_key}-cache-sg",
     enabled=ws_settings.prd_redis_enabled,
-    subnet_ids=ws_settings.private_subnets,
+    subnet_ids=ws_settings.subnet_ids,
     skip_create=skip_create,
     skip_delete=skip_delete,
     wait_for_creation=wait_for_create,
     wait_for_deletion=wait_for_delete,
 )
 
-# -*- Backend database instance #1
+# -*- Backend database instance
 db_engine = "postgres"
 prd_db_instance = DbInstance(
-    name=f"{ws_settings.prd_key}-db-a",
+    name=f"{ws_settings.prd_key}-db",
     engine=db_engine,
     enabled=ws_settings.prd_postgres_enabled,
     engine_version="14.5",
@@ -73,30 +71,6 @@ prd_db_instance = DbInstance(
     wait_for_creation=wait_for_create,
     wait_for_deletion=wait_for_delete,
 )
-
-# -*- Backend database cluster
-# prd_db_cluster = DbCluster(
-#     name=f"{ws_settings.prd_key}-db",
-#     # Database cluster name
-#     db_cluster_identifier=ws_settings.prd_key,
-#     engine=db_engine,
-#     enabled=ws_settings.prd_postgres_enabled,
-#     engine_version="14.5",
-#     allocated_storage=100,
-#     storage_type="io1",
-#     iops=1000,
-#     db_instance_class="db.m5d.large",
-#     db_instances=[prd_db_instance],
-#     availability_zones=[aws_az1, aws_az_1b, aws_az_1c],
-#     backup_retention_period=5,
-#     vpc_security_group_ids=ws_settings.security_groups,
-#     db_subnet_group=prd_db_subnet_group,
-#     secrets_file=ws_dir_path.joinpath("secrets/prd_postgres_secrets.yml"),
-#     skip_create=skip_create,
-#     skip_delete=skip_delete,
-#     wait_for_creation=wait_for_create,
-#     wait_for_deletion=wait_for_delete,
-# )
 
 # -*- Redis cache
 prd_redis_cluster = CacheCluster(
@@ -138,7 +112,7 @@ prd_api_container = EcsContainer(
     port_mappings=[{"containerPort": api_container_port}],
     command=["api-prd"],
     environment=[
-        {"name": "BUILD_ENV", "value": "prd"},
+        {"name": "RUNTIME", "value": "prd"},
         {"name": "WAIT_FOR_DB", "value": "True"},
         {"name": "WAIT_FOR_REDIS", "value": "True"},
         # {"name": "UPGRADE_DB", "value": "True"},

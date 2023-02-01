@@ -1,11 +1,7 @@
 from fastapi import APIRouter
 
 from app.router.endpoints import endpoints
-from app.utils.dttm import (
-    current_utc_str,
-    current_est_str,
-    current_pst_str,
-)
+from app.utils.dttm import current_utc_str
 
 ######################################################
 ## Router for Health Checks
@@ -21,8 +17,6 @@ def status_ping():
         "router": "status",
         "path": endpoints.PING,
         "utc": current_utc_str(),
-        "pst": current_pst_str(),
-        "est": current_est_str(),
     }
 
 
@@ -33,6 +27,4 @@ def status_health():
         "router": "status",
         "path": endpoints.HEALTH,
         "utc": current_utc_str(),
-        "pst": current_pst_str(),
-        "est": current_est_str(),
     }
