@@ -13,13 +13,13 @@ ws_settings = WorkspaceSettings(
     # -*- Dev settings
     dev_env="dev",
     # -*- Dev Apps
-    dev_api_enabled=True,
+    dev_api_server_enabled=True,
     dev_postgres_enabled=True,
     dev_redis_enabled=True,
     # -*- Production settings
     prd_env="prd",
     # -*- Production Apps
-    prd_api_enabled=True,
+    prd_api_server_enabled=True,
     prd_postgres_enabled=True,
     prd_redis_enabled=True,
     # -*- AWS settings
@@ -37,7 +37,7 @@ ws_settings = WorkspaceSettings(
     # Repository for images
     # image_repo="your-repo",
     # Build images locally
-    build_images=True,
+    # build_images=True,
     # Push images after building
     # push_images=True,
     # Skip cache when building images

@@ -11,7 +11,7 @@ from phidata.aws.resource.group import (
     EcsTaskDefinition,
 )
 
-from workspace.prd.docker_config import prd_api_image
+from workspace.prd.docker_config import prd_api_server_image
 from workspace.settings import ws_settings
 
 #
@@ -50,7 +50,7 @@ prd_redis_subnet_group = CacheSubnetGroup(
     wait_for_deletion=wait_for_delete,
 )
 
-# -*- Backend database instance
+# -*- Api database instance
 db_engine = "postgres"
 prd_db_instance = DbInstance(
     name=f"{ws_settings.prd_key}-db",
@@ -94,7 +94,7 @@ prd_redis_cluster = CacheCluster(
 launch_type = "FARGATE"
 prd_ecs_cluster = EcsCluster(
     name=f"{ws_settings.prd_key}-cluster",
-    enabled=ws_settings.prd_api_enabled,
+    enabled=ws_settings.prd_api_server_enabled,
     ecs_cluster_name=ws_settings.prd_key,
     capacity_providers=[launch_type],
     skip_create=skip_create,
@@ -103,33 +103,34 @@ prd_ecs_cluster = EcsCluster(
     wait_for_deletion=wait_for_delete,
 )
 
-# -*- Api Container
+# -*- Api Server Container
 api_container_port = 8000
-prd_api_container = EcsContainer(
-    name=f"{ws_settings.ws_name}-{ws_settings.image_suffix}",
-    enabled=ws_settings.prd_api_enabled,
-    image=prd_api_image.get_image_str(),
+prd_api_server_container = EcsContainer(
+    name=ws_settings.ws_name,
+    enabled=ws_settings.prd_api_server_enabled,
+    image=prd_api_server_image.get_image_str(),
     port_mappings=[{"containerPort": api_container_port}],
     command=["api-prd"],
     environment=[
         {"name": "RUNTIME", "value": "prd"},
-        {"name": "WAIT_FOR_DB", "value": "True"},
-        {"name": "WAIT_FOR_REDIS", "value": "True"},
-        # {"name": "UPGRADE_DB", "value": "True"},
         # Database configuration
-        {"name": "DB_HOST", "value": ""},
-        {"name": "DB_PORT", "value": "5432"},
-        {"name": "DB_USER", "value": prd_db_instance.get_master_username()},
-        {"name": "DB_PASS", "value": prd_db_instance.get_master_user_password()},
-        {"name": "DB_SCHEMA", "value": prd_db_instance.get_db_name()},
+        # {"name": "WAIT_FOR_DB", "value": "True"},
+        # {"name": "DB_HOST", "value": ""},
+        # {"name": "DB_PORT", "value": "5432"},
+        # {"name": "DB_USER", "value": prd_db_instance.get_master_username()},
+        # {"name": "DB_PASS", "value": prd_db_instance.get_master_user_password()},
+        # {"name": "DB_SCHEMA", "value": prd_db_instance.get_db_name()},
+        # Upgrade database on startup
+        # {"name": "UPGRADE_DB", "value": "True"},
         # Redis configuration
-        {"name": "REDIS_HOST", "value": ""},
-        {"name": "REDIS_PORT", "value": "6379"},
+        # {"name": "WAIT_FOR_REDIS", "value": "True"},
+        # {"name": "REDIS_HOST", "value": ""},
+        # {"name": "REDIS_PORT", "value": "6379"},
         # {"name": "REDIS_PASS", "value": ""},
-        {"name": "REDIS_SCHEMA", "value": "1"},
+        # {"name": "REDIS_SCHEMA", "value": "1"},
         # {"name": "REDIS_DRIVER", "value": "rediss"},
         # Celery configuration
-        {"name": "CELERY_REDIS_DB", "value": "2"},
+        # {"name": "CELERY_REDIS_DB", "value": "2"},
     ],
     log_configuration={
         "logDriver": "awslogs",
@@ -137,19 +138,19 @@ prd_api_container = EcsContainer(
             "awslogs-group": ws_settings.prd_key,
             "awslogs-region": ws_settings.aws_region,
             "awslogs-create-group": "true",
-            "awslogs-stream-prefix": "api",
+            "awslogs-stream-prefix": "api-server",
         },
     },
 )
 
-# -*- Api Task Definition
-prd_api_task = EcsTaskDefinition(
-    name=f"{ws_settings.prd_key}-api-td",
-    family=f"{ws_settings.prd_key}-{ws_settings.image_suffix}",
+# -*- Api Server Task Definition
+prd_api_server_task = EcsTaskDefinition(
+    name=f"{ws_settings.prd_key}-td",
+    family=ws_settings.prd_key,
     network_mode="awsvpc",
     cpu="512",
     memory="1024",
-    containers=[prd_api_container],
+    containers=[prd_api_server_container],
     requires_compatibilities=[launch_type],
     skip_create=skip_create,
     skip_delete=skip_delete,
@@ -157,14 +158,14 @@ prd_api_task = EcsTaskDefinition(
     wait_for_deletion=wait_for_delete,
 )
 
-# -*- Api Service
+# -*- Api Server Service
 prd_api_service = EcsService(
-    name=f"{ws_settings.prd_key}-api-service",
-    ecs_service_name=f"{ws_settings.prd_key}-{ws_settings.image_suffix}",
-    desired_count=3,
+    name=f"{ws_settings.prd_key}-service",
+    ecs_service_name=ws_settings.prd_key,
+    desired_count=1,
     launch_type=launch_type,
     cluster=prd_ecs_cluster,
-    task_definition=prd_api_task,
+    task_definition=prd_api_server_task,
     network_configuration={
         "awsvpcConfiguration": {
             "subnets": ws_settings.public_subnets,
@@ -188,7 +189,7 @@ prd_aws_resources = AwsResourceGroup(
     cache_subnet_groups=[prd_redis_subnet_group],
     cache_clusters=[prd_redis_cluster],
     ecs_clusters=[prd_ecs_cluster],
-    ecs_task_definitions=[prd_api_task],
+    ecs_task_definitions=[prd_api_server_task],
     ecs_services=[prd_api_service],
 )
 
